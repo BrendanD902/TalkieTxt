@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TalkieTxt Local Dictation</title>
+    <script type="module" src="/src/main.ts" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <section id="onboarding" class="onboarding" hidden>
+        <div class="onboarding-backdrop"></div>
+        <div class="onboarding-panel">
+          <div class="onboarding-copy">
+            <p class="eyebrow">First-Run Setup</p>
+            <h2>Set up TalkieTxt once, then close the window and dictate from anywhere.</h2>
+            <p class="subtitle">
+              Choose your local Whisper model, verify the two macOS permission areas, and confirm the
+              tray behavior. After that, the app behaves like a normal background utility.
+            </p>
+          </div>
+
+          <div class="onboarding-grid">
+            <article class="onboarding-card">
+              <p class="label">1. Local model</p>
+              <h3 id="onboarding-model-heading">Connect your local Whisper model</h3>
+              <p id="onboarding-model-copy" class="meta">
+                TalkieTxt checks its managed <strong>models</strong> folder automatically first. If it
+                already finds a compatible model there, you do not need to browse manually.
+              </p>
+              <div class="checkline">
+                <span id="onboarding-model-chip" class="chip chip-missing">missing</span>
+                <p id="onboarding-model-message" class="meta">No model selected yet.</p>
+              </div>
+              <div class="hero-actions">
+                <button id="onboarding-browse-model" type="button" class="primary-action">Choose different model</button>
+                <button id="onboarding-save-model" type="button" class="secondary">Save model choice</button>
+              </div>
+            </article>
+
+            <article class="onboarding-card">
+              <p class="label">2. macOS permissions</p>
+              <h3>macOS will usually prompt when access is needed</h3>
+              <p class="meta">
+                Microphone access is requested the first time you record. Accessibility access is only
+                needed for paste automation. You can still open the System Settings pages manually below
+                if you want to verify or change them.
+              </p>
+              <div class="permission-actions">
+                <button id="open-mic-settings" type="button" class="secondary">Open Microphone Settings</button>
+                <button id="open-accessibility-settings" type="button" class="secondary">Open Accessibility Settings</button>
+              </div>
+            </article>
+
+            <article class="onboarding-card">
+              <p class="label">3. Background behavior</p>
+              <h3>Close the window, keep the app running</h3>
+              <p class="meta">
+                The red close button hides the window. TalkieTxt keeps running in the tray so your
+                hotkey continues working. Use the tray menu when you want to reopen settings or fully quit.
+              </p>
+              <ul class="onboarding-list">
+                <li>Hotkey: <strong id="onboarding-hotkey">Option+Space</strong></li>
+                <li>Primary mode: <strong id="onboarding-mode-copy">Hold to talk</strong></li>
+                <li>Quit path: tray icon → Quit</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="onboarding-footer">
+            <p id="onboarding-ready-message" class="meta">
+              Finish setup after your model status turns ready.
+            </p>
+            <div class="hero-actions">
+              <button id="finish-onboarding" type="button" class="primary-action">Finish setup</button>
+              <button id="dismiss-onboarding" type="button" class="secondary">Skip for now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">TalkieTxt</p>
+          <h1>Fast local dictation that stays out of the way.</h1>
+          <p class="subtitle">
+            Press <strong id="hotkey-hint">Option+Space</strong>
+            <span id="hotkey-action-copy">and hold while you speak, then release to transcribe.</span>
+            Close the window any time: the app keeps running in the tray and your global hotkey still
+            works.
+          </p>
+          <div class="hero-actions">
+            <button id="toggle-record" type="button" class="primary-action">Start dictation</button>
+            <button id="reset-state" type="button" class="secondary">Reset state</button>
+          </div>
+          <p class="tray-note">
+            Best practice on macOS: close the window to clear your workspace, then reopen from the tray icon when you need settings.
+          </p>
+        </div>
+        <div class="hero-status">
+          <div class="status-stack">
+            <div class="metric-card">
+              <p class="label">Dictation</p>
+              <div class="metric-row">
+                <p id="state-label" class="state">idle</p>
+                <span id="state-chip" class="chip chip-idle">idle</span>
+              </div>
+              <p class="meta">Source: <span id="state-source">bootstrap</span></p>
+            </div>
+            <div class="metric-card">
+              <p class="label">Model</p>
+              <div class="metric-row">
+                <p id="model-status" class="state subtle">missing</p>
+                <span id="model-chip" class="chip chip-missing">missing</span>
+              </div>
+              <p id="model-message" class="meta">Select a local GGML Whisper model to enable dictation.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p id="error-banner" class="error" hidden></p>
+
+      <section class="grid">
+        <div class="column">
+          <section class="panel-card">
+            <div class="card-head">
+              <div>
+                <p class="label">Input Device</p>
+                <p id="device-hint" class="mono">Default microphone</p>
+              </div>
+              <p id="capture-meta" class="meta">No capture yet</p>
+            </div>
+          </section>
+
+          <section class="panel-card quickstart-card">
+            <div class="card-head">
+              <div>
+                <p class="label">Daily Flow</p>
+                <p class="meta">The app is designed to stay out of your way after setup.</p>
+              </div>
+            </div>
+            <ol class="quickstart-list">
+              <li id="quickstart-step-1">Press and hold <strong>Option+Space</strong> to dictate.</li>
+              <li id="quickstart-step-2">Release to transcribe and paste into the active app.</li>
+              <li>Close the window when you’re done. The tray app stays active.</li>
+            </ol>
+          </section>
+
+          <section class="panel-card transcript-card">
+            <div class="card-head">
+              <div>
+                <p class="label">Transcript</p>
+                <p id="transcript-engine" class="meta">Waiting for the next utterance</p>
+              </div>
+            </div>
+            <pre id="transcript-body" class="transcript">Your latest transcript appears here.</pre>
+          </section>
+
+          <section class="panel-card">
+            <div class="card-head">
+              <div>
+                <p class="label">Insertion Result</p>
+                <p id="insert-status" class="mono">idle</p>
+              </div>
+            </div>
+            <p id="insert-message" class="meta">Transcripts paste into the active app, or fall back to clipboard copy if paste automation fails.</p>
+          </section>
+        </div>
+
+        <div class="column">
+          <section class="panel-card settings-card">
+            <div class="card-head">
+              <div>
+                <p class="label">Settings</p>
+                <p class="meta">Model, hotkey behavior, paste mode, and device preferences.</p>
+              </div>
+              <p id="save-feedback" class="save-feedback">Settings are saved locally.</p>
+            </div>
+
+            <div class="field">
+              <label for="model-path">Whisper model</label>
+              <div class="field-row">
+                <input id="model-path" type="text" placeholder="/path/to/ggml-tiny.en.bin" />
+                <button id="browse-model" type="button" class="secondary">Browse</button>
+              </div>
+            </div>
+
+            <div class="field two-up">
+              <div>
+                <label for="model-preset">Model preset</label>
+                <select id="model-preset">
+                  <option value="tinyEn">tiny.en</option>
+                  <option value="baseEn">base.en</option>
+                </select>
+              </div>
+              <div>
+                <label for="hotkey-mode">Hotkey mode</label>
+                <select id="hotkey-mode">
+                  <option value="holdToTalk">Hold to Talk</option>
+                  <option value="toggle">Toggle</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="preferred-input-device">Preferred input device</label>
+              <div class="field-row">
+                <select id="preferred-input-device"></select>
+                <button id="refresh-devices" type="button" class="secondary">Refresh</button>
+              </div>
+            </div>
+
+            <div class="field two-up">
+              <div>
+                <label for="log-level">Log level</label>
+                <select id="log-level">
+                  <option value="error">error</option>
+                  <option value="warn">warn</option>
+                  <option value="info">info</option>
+                  <option value="debug">debug</option>
+                  <option value="trace">trace</option>
+                </select>
+              </div>
+              <div class="checks">
+                <label><input id="paste-after-transcribe" type="checkbox" checked /> Paste after transcribe</label>
+                <label><input id="save-debug-wav" type="checkbox" /> Save debug WAV</label>
+              </div>
+            </div>
+
+            <div class="settings-footer">
+              <button id="save-settings" type="button">Save settings</button>
+              <p class="footer-note">Closing the window hides TalkieTxt. It does not stop the tray app or the hotkey.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

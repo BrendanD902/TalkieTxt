@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "TalkieTxt",
+  "version": "0.1.0",
+  "identifier": "com.brendandalziel.walkietalkie",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "TalkieTxt",
+        "width": 1180,
+        "height": 860,
+        "minWidth": 980,
+        "minHeight": 720
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Productivity",
+    "shortDescription": "Low-latency local dictation for macOS.",
+    "longDescription": "TalkieTxt is a local-first desktop dictation app for macOS. It keeps a Whisper model warm in memory, captures audio in memory, transcribes on-device, and pastes the result back into your active app with lower latency than the old CLI pipeline.",
+    "copyright": "Copyright (c) 2026 Brendan Dalziel",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  }
+}

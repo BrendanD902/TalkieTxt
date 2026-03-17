@@ -1,0 +1,38 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="164" y1="132" x2="832" y2="888" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F766E"/>
+      <stop offset="0.58" stop-color="#0EA5E9"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(778 228) rotate(138.652) scale(366.751)">
+      <stop stop-color="#ECFEFF" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#ECFEFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="152" y="160" width="720" height="760" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="22"/>
+      <feGaussianBlur stdDeviation="26"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0431 0 0 0 0 0.102 0 0 0 0 0.1608 0 0 0 0.24 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_2"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_2" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect x="88" y="88" width="848" height="848" rx="208" fill="url(#bg)"/>
+  <rect x="88" y="88" width="848" height="848" rx="208" fill="url(#glow)"/>
+
+  <circle cx="816" cy="232" r="124" fill="#ECFEFF" fill-opacity="0.14"/>
+  <circle cx="236" cy="796" r="152" fill="#042F2E" fill-opacity="0.18"/>
+
+  <g filter="url(#shadow)">
+    <path d="M512 278C566.124 278 610 321.876 610 376V520C610 574.124 566.124 618 512 618C457.876 618 414 574.124 414 520V376C414 321.876 457.876 278 512 278Z" fill="#F8FAFC"/>
+    <path d="M366 514C366 594.634 431.366 660 512 660C592.634 660 658 594.634 658 514" stroke="#F8FAFC" stroke-width="52" stroke-linecap="round"/>
+    <path d="M512 660V760" stroke="#F8FAFC" stroke-width="52" stroke-linecap="round"/>
+    <path d="M446 760H578" stroke="#F8FAFC" stroke-width="52" stroke-linecap="round"/>
+    <path d="M314 386C351.428 333.952 411.554 300 479.611 300" stroke="#D1FAE5" stroke-width="36" stroke-linecap="round" stroke-opacity="0.9"/>
+    <path d="M710 386C672.572 333.952 612.446 300 544.389 300" stroke="#FDE68A" stroke-width="36" stroke-linecap="round" stroke-opacity="0.88"/>
+  </g>
+</svg>
