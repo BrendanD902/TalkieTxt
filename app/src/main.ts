@@ -46,7 +46,7 @@ type TranscriptPayload = {
 };
 
 type InsertResultPayload = {
-  status: "pasted" | "clipboardOnly" | "skipped";
+  status: "pasted" | "typed" | "clipboardOnly" | "skipped";
   message: string;
 };
 
@@ -54,6 +54,11 @@ type ErrorPayload = {
   message: string;
   source: string;
 };
+
+const isOverlay = window.location.hash === "#overlay";
+if (isOverlay) {
+  document.body.classList.add("overlay-mode");
+}
 
 const stateLabel = document.querySelector<HTMLElement>("#state-label");
 const stateSource = document.querySelector<HTMLElement>("#state-source");
@@ -108,6 +113,8 @@ const dismissOnboardingButton =
   document.querySelector<HTMLButtonElement>("#dismiss-onboarding");
 const quickstartStepOne = document.querySelector<HTMLElement>("#quickstart-step-1");
 const quickstartStepTwo = document.querySelector<HTMLElement>("#quickstart-step-2");
+const overlayStateLabel = document.querySelector<HTMLElement>("#overlay-state");
+const overlayHintLabel = document.querySelector<HTMLElement>("#overlay-hint");
 
 let currentStatus: StatusPayload | null = null;
 let currentSettings: AppSettings | null = null;
@@ -285,6 +292,12 @@ function renderStatus(status: StatusPayload) {
   setChipState(stateChip, status.state, "chip");
   setChipState(modelChip, status.modelStatus, "chip");
   if (hotkeyHint) hotkeyHint.textContent = status.hotkeyHint;
+  if (overlayStateLabel) {
+    overlayStateLabel.textContent = status.state === "idle" ? "Ready" : status.state;
+  }
+  if (overlayHintLabel) {
+    overlayHintLabel.textContent = status.hotkeyHint;
+  }
   syncHotkeyCopy(status);
   if (deviceHint) {
     deviceHint.textContent =

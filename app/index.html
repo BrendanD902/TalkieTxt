@@ -165,7 +165,7 @@
                 <p id="insert-status" class="mono">idle</p>
               </div>
             </div>
-            <p id="insert-message" class="meta">Transcripts paste into the active app, or fall back to clipboard copy if paste automation fails.</p>
+            <p id="insert-message" class="meta">Transcripts paste into the active app, or fall back to direct typing and then clipboard copy if paste automation fails.</p>
           </section>
         </div>
 
@@ -237,5 +237,14 @@
         </div>
       </section>
     </main>
+    <section id="overlay-root" class="overlay-container" hidden>
+      <div class="overlay-content">
+        <div id="overlay-status-dot" class="status-dot"></div>
+        <div class="overlay-text">
+          <p id="overlay-state" class="overlay-state-label">Ready</p>
+          <p id="overlay-hint" class="overlay-hint-label">Option + Space</p>
+        </div>
+      </div>
+    </section>
   </body>
 </html>

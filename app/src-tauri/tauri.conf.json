@@ -13,11 +13,24 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "label": "main",
         "title": "TalkieTxt",
         "width": 1180,
         "height": 860,
         "minWidth": 980,
         "minHeight": 720
+      },
+      {
+        "label": "overlay",
+        "url": "index.html#overlay",
+        "width": 260,
+        "height": 64,
+        "alwaysOnTop": true,
+        "decorations": false,
+        "transparent": true,
+        "visible": false,
+        "focus": false,
+        "skipTaskbar": true
       }
     ],
     "security": {

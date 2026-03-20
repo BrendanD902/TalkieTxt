@@ -7,11 +7,12 @@ mod state;
 mod transcription;
 
 use settings::AppSettings;
+use state::DictationState;
 use tauri::{
     image::Image,
     menu::MenuBuilder,
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager, WindowEvent,
+    Listener, Manager, WindowEvent,
 };
 use tauri_plugin_global_shortcut::{
     Builder as GlobalShortcutBuilder, Code, GlobalShortcutExt, Modifiers, Shortcut,
@@ -31,6 +32,7 @@ use crate::{
 };
 
 const MAIN_WINDOW_LABEL: &str = "main";
+const OVERLAY_WINDOW_LABEL: &str = "overlay";
 const TRAY_ICON_ID: &str = "walkie-tray";
 const TRAY_MENU_SHOW_ID: &str = "tray_show";
 const TRAY_MENU_QUIT_ID: &str = "tray_quit";
@@ -49,6 +51,40 @@ fn show_main_window(app_handle: &tauri::AppHandle) {
         let _ = window.unminimize();
         let _ = window.show();
         let _ = window.set_focus();
+    }
+}
+
+fn sync_overlay_visibility(app_handle: &tauri::AppHandle, state: DictationState) {
+    if let Some(overlay) = app_handle.get_webview_window(OVERLAY_WINDOW_LABEL) {
+        match state {
+            DictationState::Listening | DictationState::Processing => {
+                let _ = overlay.show();
+            }
+            DictationState::Idle | DictationState::Error => {
+                let _ = overlay.hide();
+            }
+        }
+    }
+}
+
+fn update_tray_icon(app_handle: &tauri::AppHandle, state: DictationState) {
+    let tray = match app_handle.tray_by_id(TRAY_ICON_ID) {
+        Some(tray) => tray,
+        None => return,
+    };
+
+    #[cfg(target_os = "macos")]
+    {
+        let icon_bytes = match state {
+            DictationState::Listening => include_bytes!("../icons/trayColor.png").as_slice(),
+            _ => include_bytes!("../icons/trayTemplate.png").as_slice(),
+        };
+
+        if let Ok(icon) = Image::from_bytes(icon_bytes) {
+            let is_template = !matches!(state, DictationState::Listening);
+            let _ = tray.set_icon(Some(icon));
+            let _ = tray.set_icon_as_template(is_template);
+        }
     }
 }
 
@@ -89,9 +125,9 @@ fn install_tray_icon(app_handle: &tauri::AppHandle) -> Result<(), AppError> {
 
     #[cfg(target_os = "macos")]
     {
-        let icon = Image::from_bytes(include_bytes!("../icons/trayColor.png"))
+        let icon = Image::from_bytes(include_bytes!("../icons/trayTemplate.png"))
             .map_err(|error| AppError::Message(format!("Failed to load tray icon: {error}")))?;
-        tray_builder = tray_builder.icon(icon).icon_as_template(false);
+        tray_builder = tray_builder.icon(icon).icon_as_template(true);
     }
 
     #[cfg(not(target_os = "macos"))]
@@ -126,8 +162,10 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {
-                api.prevent_close();
-                let _ = window.hide();
+                if window.label() == MAIN_WINDOW_LABEL {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
             }
         })
         .setup(|app| {
@@ -148,6 +186,15 @@ pub fn run() {
             app.state::<StatusManager>().apply_settings(&settings);
 
             install_tray_icon(&app_handle)?;
+
+            // Listen for status changes to update overlay and tray
+            let status_handle = app_handle.clone();
+            app.listen("dictation://status", move |_event| {
+                let state = status_handle.state::<StatusManager>().snapshot().state;
+                sync_overlay_visibility(&status_handle, state);
+                update_tray_icon(&status_handle, state);
+            });
+
             commands::emit_status(&app_handle);
             reload_model_async(app_handle);
             Ok(())
